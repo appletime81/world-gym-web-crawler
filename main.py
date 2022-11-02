@@ -32,21 +32,16 @@ data = {
     "vTeacher": "",
     "vKeyword": "",
     "vSID": "taipei-station",
-    "vWeek": "0", # 0 for this week, 1 for next week, -1 for last week, 依此類推
+    "vWeek": "0",  # 0 for this week, 1 for next week, -1 for last week, 依此類推
 }
 
 url = "https://www.worldgymtaiwan.com/getStoreClass"
 
 days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
-week_dates_str = [
-    datetime.datetime.strftime(
-        datetime.datetime.now()
-        + datetime.timedelta(days=i + 7 * int(data.get("vWeek"))),
-        "%Y-%m-%d",
-    )
-    for i in range(7)
-]
+week_dates = [datetime.date.today() + datetime.timedelta(days=i) for i in
+              range(int(data.get("vWeek")) * 7 - datetime.date.today().weekday(), 7 - datetime.date.today().weekday())]
+week_dates_str = [date.strftime("%Y-%m-%d") for date in week_dates][:7]
 
 
 def get_week_class_table():
@@ -61,7 +56,7 @@ def get_week_class_table():
         class_instructor = table.find_all("div", class_="class-instructor")
         print("-" * 30 + day + "-" * 300)
         for class_time, class_name, class_instructor in zip(
-            class_times, class_names, class_instructor
+                class_times, class_names, class_instructor
         ):
             print(
                 f"課程名稱:{class_time.text}, 時間:{class_time.text}, 教練:{class_instructor.text}"
